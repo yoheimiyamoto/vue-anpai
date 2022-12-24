@@ -51,12 +51,12 @@ export default {
       <form>
         <fieldset class="tiles" v-for="tile in tiles" :key="tile.id">
           <p class="h5">{{ tile.text }}</p>  
-          <input type="checkbox" v-model="tile.selected" @change="changed(tile)">
+          <input class="big-checkbox" type="checkbox" v-model="tile.selected" @change="changed(tile)">
         </fieldset>
       </form>
       <div class="suji">
-        <div v-if="safe_tiles.length">{{safe_tiles.join(',')}}</div>
-        <div v-else>なし</div>
+        <p class="h5" v-if="safe_tiles.length">{{safe_tiles.join(',')}}</p>
+        <p class="h5" v-else>なし</p>
       </div>
       <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
     </div>
@@ -79,6 +79,11 @@ export default {
 
 span {
   padding: 3px;
+}
+
+.big-checkbox {
+  width: 20px;
+  height: 20px;
 }
 
 </style>
