@@ -3,7 +3,10 @@ import {get_suji} from '../helpers/suji'
 let id: number = 0
 
 export default {
-  data() {
+  data(): {
+    tiles: any
+    safe_tiles: number[]
+  } {
     return {
       tiles: [
         { id: id++, text: 1, selected: false },
@@ -28,7 +31,7 @@ export default {
         tile.selected = false
       })
     },
-    changed(tile: number) {
+    changed(tile: any) {
       // 選択しているNumberの取得
       const selected_tiles = this.tiles.filter((t: any) => t.selected == true)
       const selected_number = selected_tiles.map(selected_tile => selected_tile.text)
@@ -41,23 +44,32 @@ export default {
 </script>
 
 <template>
-  <div>
-    <ul>
-      <li v-for="tile in tiles" :key="tile.id">
-        <input type="checkbox" v-model="tile.selected" @change="changed(tile)">
-        <span :class="{ done: tile.done }">{{ tile.text }}</span>
-      </li>
-    </ul>
-
-    <button @click="clearSelectedTiles">Clear</button>
-
-    <p>safe tiles</p>
-    <p>{{safe_tiles}}</p>
+  <div class="card">
+    <div class="card-body">
+      <h5 class="card-title"><slot></slot></h5>
+      <form>
+        <fieldset class="tiles" v-for="tile in tiles" :key="tile.id">
+          <input type="checkbox" v-model="tile.selected" @change="changed(tile)">
+          <span>{{ tile.text }}</span>  
+        </fieldset>
+      </form>
+      <div>{{safe_tiles}}</div>
+      <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
+    </div>
   </div>
 </template>
 
 <style>
+.tiles {
+  display:inline-block;
+  margin-right: 10px;
+}
+
 .title {
   color: red;
+}
+
+.card{
+    margin-bottom: 10px;
 }
 </style>

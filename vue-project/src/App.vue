@@ -1,5 +1,11 @@
-<script setup lang="ts">
+<script lang="ts">
 import Tiles from './components/Tiles.vue'
+
+export default {
+  components: {
+    Tiles
+  }
+}
 </script>
 
 <template>
@@ -11,9 +17,11 @@ import Tiles from './components/Tiles.vue'
   </header>
 
   <main>
-    <Tiles />
-    <Tiles />
-    <Tiles />
+    <div>
+      <Tiles class="tiles">ワンズ</Tiles>
+      <Tiles class="tiles">ピンズ</Tiles>
+      <Tiles class="tiles">ソーズ</Tiles>
+    </div>
   </main>
 </template>
 
@@ -38,10 +46,18 @@ header {
     margin: 0 2rem 0 0;
   }
 
+  .tiles {
+    margin: 10px
+  }
+
   header .wrapper {
     display: flex;
     place-items: flex-start;
     flex-wrap: wrap;
+  }
+
+  body {
+    overflow-x: hidden;
   }
 }
 </style>
