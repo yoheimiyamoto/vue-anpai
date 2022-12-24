@@ -30,6 +30,7 @@ export default {
       this.tiles.forEach((tile: any, index: number) => {
         tile.selected = false
       })
+      this.safe_tiles = []
     },
     changed(tile: any) {
       // 選択しているNumberの取得
@@ -53,7 +54,10 @@ export default {
           <span>{{ tile.text }}</span>  
         </fieldset>
       </form>
-      <div>{{safe_tiles}}</div>
+      <div class="suji">
+        <div v-if="safe_tiles.length">{{safe_tiles.join(',')}}</div>
+        <div v-else>なし</div>
+      </div>
       <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
     </div>
   </div>
@@ -72,4 +76,13 @@ export default {
 .card{
     margin-bottom: 10px;
 }
+
+.suji {
+  padding: 5px;
+}
+
+span {
+  padding: 3px;
+}
+
 </style>
