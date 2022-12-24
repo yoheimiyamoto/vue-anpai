@@ -1,11 +1,12 @@
 <script lang="ts">
-import {get_suji} from '../helpers/suji'
+import {get_anpai, get_kiken_hai} from '../helpers/suji'
 let id: number = 0
 
 export default {
   data(): {
     tiles: any
-    safe_tiles: number[]
+    safe_numbers: number[]
+    kiken_numbers: number[]
   } {
     return {
       tiles: [
@@ -20,25 +21,30 @@ export default {
         { id: id++, text: 9, selected: false }
       ],
 
-      safe_tiles: []
+      safe_numbers: [],
+      kiken_numbers: []
     }
   },
 
   methods: {
-    // 選択した牌をすべて未選択に変更
-    clearSelectedTiles() {
-      this.tiles.forEach((tile: any, index: number) => {
-        tile.selected = false
-      })
-      this.safe_tiles = []
-    },
-    changed(tile: any) {
+    clickTile(tile) {
+      tile.selected = ! tile.selected
+
       // 選択しているNumberの取得
       const selected_tiles = this.tiles.filter((t: any) => t.selected == true)
       const selected_number = selected_tiles.map(selected_tile => selected_tile.text)
 
       // 安牌の取得
-      this.safe_tiles = get_suji(selected_number)
+      this.safe_numbers = get_anpai(selected_number)
+      this.kiken_numbers = get_kiken_hai(selected_number)
+    },
+
+    // 選択した牌をすべて未選択に変更
+    clearSelectedTiles() {
+      this.tiles.forEach((tile: any, index: number) => {
+        tile.selected = false
+      })
+      this.safe_numbers = []
     }
   }
 }
@@ -48,17 +54,23 @@ export default {
   <div class="card">
     <div class="card-body">
       <h5 class="card-title"><slot></slot></h5>
-      <form>
-        <fieldset class="tiles" v-for="tile in tiles" :key="tile.id">
-          <p class="h5">{{ tile.text }}</p>  
-          <input class="big-checkbox" type="checkbox" v-model="tile.selected" @change="changed(tile)">
-        </fieldset>
-      </form>
+      <div class="tiles" v-for="tile in tiles" :key="tile.id">
+        <button v-bind:class="{selected: tile.selected}" @click="clickTile(tile)">{{tile.text}}</button>
+      </div>
       <div class="suji">
-        <p class="h5" v-if="safe_tiles.length">{{safe_tiles.join(',')}}</p>
+        <p>安牌</p>
+        <p class="h5" v-if="safe_numbers.length">{{safe_numbers.join(',')}}</p>
+        <p class="h5" v-else>なし</p>
+      </div>
+      <div class="suji">
+        <p>危険牌</p>
+        <p class="h5" v-if="kiken_numbers.length">{{safe_numbers.join(',')}}</p>
         <p class="h5" v-else>なし</p>
       </div>
       <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
+      <div>
+        {{tiles}}
+      </div>
     </div>
   </div>
 </template>
@@ -79,6 +91,10 @@ export default {
 
 span {
   padding: 3px;
+}
+
+.selected {
+  color: red;
 }
 
 .big-checkbox {

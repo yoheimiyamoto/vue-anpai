@@ -1,16 +1,27 @@
 import { describe, it, expect } from 'vitest';
-import {get_suji, get_omote_suji, get_naka_suji, get_ura_suji, frequency_sort} from './suji';
+import {get_anpai, get_kiken_hai, get_omote_suji, get_naka_suji, get_ura_suji, frequency_sort} from './suji';
 
-describe('get_suji', () => {
-  it('get_suji', () => {
+describe('get_anpai', () => {
+  it('get_anpai', () => {
     // 表スジ 4 => 1,7
-    // 裏スジ 4 => 5,8
-    expect(get_suji([4])).toEqual([1,5,7,8])
+    expect(get_anpai([4])).toEqual([1,7])
 
-    // 裏スジ 1 => 2,5
-    // 裏スジ 7 => 3,6
     // 中スジ => 4
-    expect(get_suji([1,7])).toEqual([2,3,4,5,6])
+    expect(get_anpai([1,7])).toEqual([4])
+  })
+})
+
+describe('get_kiken_hai', () => {
+  it('get_kiken_hai', () => {
+    expect(get_kiken_hai([1])).toEqual([2,5])
+    expect(get_kiken_hai([2])).toEqual([3,6])
+    expect(get_kiken_hai([3])).toEqual([4,7])
+    expect(get_kiken_hai([4])).toEqual([5,8])
+    expect(get_kiken_hai([5])).toEqual([1,4,6,9])
+    expect(get_kiken_hai([6])).toEqual([2,5])
+    expect(get_kiken_hai([7])).toEqual([3,6])
+    expect(get_kiken_hai([8])).toEqual([4,7])
+    expect(get_kiken_hai([9])).toEqual([5,8])
   })
 })
 

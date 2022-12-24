@@ -1,5 +1,5 @@
 // 安牌の取得
-export function get_suji (numbers: number[]): number[] {
+export function get_anpai (numbers: number[]): number[] {
   /*
   Args:
     numbers: List[int] 捨て牌
@@ -14,12 +14,9 @@ export function get_suji (numbers: number[]): number[] {
 
   // 中スジ
   const naka_suji = get_naka_suji(numbers)
-  
-  // 裏スジ
-  const ura_suji = get_ura_suji(numbers)
 
   // スジを結合
-  safe_numbers = safe_numbers.concat(...omote_suji, ...naka_suji, ...ura_suji)
+  safe_numbers = safe_numbers.concat(...omote_suji, ...naka_suji)
 
   // 頻出頻度が高い順に並び替え
   return frequency_sort(safe_numbers)
@@ -69,9 +66,18 @@ export function get_naka_suji(numbers: number[]): Set<number> {
 // 方スジの取得
 // 確率が低いので除外
 
+// 危険牌の取得
+export function get_kiken_hai (numbers: number[]): number[] {
+  let kiken_numbers: number[] = [] 
+
+  numbers = kiken_numbers.concat(...get_ura_suji(numbers))
+  
+  return numbers
+}
+
 // 裏スジの取得
 export function get_ura_suji(numbers: number[]): Set<number> {
-  const safe_numbers = new Set<number>()
+  const kiken_numbers = new Set<number>()
 
   let rules: { [name: number]: number[] } = {
     1: [2,5],
@@ -87,11 +93,11 @@ export function get_ura_suji(numbers: number[]): Set<number> {
 
   numbers.forEach(function (p) {
     if (p in rules) {
-      rules[p].forEach(safe_number => safe_numbers.add(safe_number))
+      rules[p].forEach(safe_number => kiken_numbers.add(safe_number))
     }
   })
 
-  return safe_numbers
+  return kiken_numbers
 }
 
 /* ToDo: 実装が汚いので後できれいにする */
