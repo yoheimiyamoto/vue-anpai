@@ -64,7 +64,7 @@ export default {
       </div>
       <div class="suji">
         <p>危険牌</p>
-        <p class="h5" v-if="kiken_numbers.length">{{safe_numbers.join(',')}}</p>
+        <p class="h5" v-if="kiken_numbers.length">{{kiken_numbers.join(',')}}</p>
         <p class="h5" v-else>なし</p>
       </div>
       <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
