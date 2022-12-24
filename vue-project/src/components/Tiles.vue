@@ -68,9 +68,9 @@ export default {
         <p class="h5" v-else>なし</p>
       </div>
       <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
-      <div>
+      <!-- <div>
         {{tiles}}
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
