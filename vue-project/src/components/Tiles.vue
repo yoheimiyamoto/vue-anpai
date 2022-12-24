@@ -50,8 +50,8 @@ export default {
       <h5 class="card-title"><slot></slot></h5>
       <form>
         <fieldset class="tiles" v-for="tile in tiles" :key="tile.id">
+          <p class="h5">{{ tile.text }}</p>  
           <input type="checkbox" v-model="tile.selected" @change="changed(tile)">
-          <span>{{ tile.text }}</span>  
         </fieldset>
       </form>
       <div class="suji">
@@ -66,11 +66,7 @@ export default {
 <style>
 .tiles {
   display:inline-block;
-  margin-right: 10px;
-}
-
-.title {
-  color: red;
+  margin-right: 40px;
 }
 
 .card{
