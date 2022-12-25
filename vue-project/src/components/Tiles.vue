@@ -65,9 +65,9 @@ export default {
         if (tile.selected) {
           tile.status = 'selected'
         } else if (tile.anpai) {
-          this.status = 'anpai'
+          tile.status = 'anpai'
         } else {
-          this.status = 'kiken'
+          tile.status = 'kiken'
         }
       })
     },
@@ -90,7 +90,12 @@ export default {
     <div class="card-body">
       <h5 class="card-title"><slot></slot></h5>
       <div class="tiles" v-for="tile in tiles" :key="tile.id">
-        <button v-bind:class="tile.status" @click="clickTile(tile)">{{tile.text}}</button>
+        <!-- <img src="@/assets/images/blue_11.png" alt="Snow"> -->
+        <!-- <button v-bind:class="tile.status" @click="clickTile(tile)">{{tile.text}}</button> -->
+        <!-- <button style="background-image:url(@/assets/images/blue_11.png)" @click="clickTile(tile)">{{tile.text}}</button> -->
+        <!-- <a href=""> -->
+          <img @click="clickTile(tile)" src="@/assets/images/blue_11.png">
+        <!-- </a> -->
       </div>
       <div class="suji">
         <p>安牌</p>
