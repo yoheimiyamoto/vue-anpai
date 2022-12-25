@@ -3,6 +3,10 @@ import {get_anpai, get_kiken_hai} from '../helpers/suji'
 let id: number = 0
 
 export default {
+  props: {
+    tile_type: Number
+  },
+
   data(): {
     tiles: any
     safe_numbers: number[]
@@ -10,19 +14,19 @@ export default {
   } {
     return {
       tiles: [
-        { id: id++, text: 1, selected: false, anpai: false,  kiken: false, status: ''},
-        { id: id++, text: 2, selected: false, anpai: false,  kiken: false, status: '',  },
-        { id: id++, text: 3, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 4, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 5, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 6, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 7, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 8, selected: false, anpai: false,  kiken: false, status: '' },
-        { id: id++, text: 9, selected: false, anpai: false,  kiken: false, status: '' }
+        { id: id++, text: 1, img: '1.png', selected: false, anpai: false,  kiken: false, status: 'default'},
+        { id: id++, text: 2, img: '2.png', selected: false, anpai: false,  kiken: false, status: 'default',  },
+        { id: id++, text: 3, img: '3.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 4, img: '4.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 5, img: '5.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 6, img: '6.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 7, img: '7.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 8, img: '8.png', selected: false, anpai: false,  kiken: false, status: 'default' },
+        { id: id++, text: 9, img: '9.png', selected: false, anpai: false,  kiken: false, status: 'default' }
       ],
 
       safe_numbers: [],
-      kiken_numbers: []
+      kiken_numbers: [],
     }
   },
 
@@ -37,6 +41,13 @@ export default {
       // 安牌の取得
       this.safe_numbers = get_anpai(selected_number)
       this.kiken_numbers = get_kiken_hai(selected_number)
+
+      // フラグの初期化
+      this.tiles.forEach((tile: any, index: number) => {
+        tile.anpai = false
+        tile.kiken = false
+        tile.status = 'default'
+      })
 
       // 危険牌のフラグ追加
       for (let i = 0; i < this.kiken_numbers.length; i++) {
@@ -62,12 +73,14 @@ export default {
 
       // status設定
       this.tiles.forEach(function(tile){
+        tile.status = 'default'
+
         if (tile.selected) {
           tile.status = 'selected'
         } else if (tile.anpai) {
-          tile.status = 'anpai'
-        } else {
-          tile.status = 'kiken'
+          tile.status = 'safe'
+        } else if (tile.kiken) {
+          tile.status = 'danger'
         }
       })
     },
@@ -86,18 +99,14 @@ export default {
 </script>
 
 <template>
-  <div class="card">
-    <div class="card-body">
-      <h5 class="card-title"><slot></slot></h5>
+  <div  style="width: 100%;">
+  <!-- <div class="card" style="width: 1000px;"> -->
+    <!-- <div class="card-body"> -->
+      <!-- <h5 class="card-title"><slot></slot></h5> -->
       <div class="tiles" v-for="tile in tiles" :key="tile.id">
-        <!-- <img src="@/assets/images/blue_11.png" alt="Snow"> -->
-        <!-- <button v-bind:class="tile.status" @click="clickTile(tile)">{{tile.text}}</button> -->
-        <!-- <button style="background-image:url(@/assets/images/blue_11.png)" @click="clickTile(tile)">{{tile.text}}</button> -->
-        <!-- <a href=""> -->
-          <img @click="clickTile(tile)" src="@/assets/images/blue_11.png">
-        <!-- </a> -->
+        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
       </div>
-      <div class="suji">
+      <!-- <div class="suji">
         <p>安牌</p>
         <p class="h5" v-if="safe_numbers.length">{{safe_numbers.join(',')}}</p>
         <p class="h5" v-else>なし</p>
@@ -106,26 +115,31 @@ export default {
         <p>危険牌</p>
         <p class="h5" v-if="kiken_numbers.length">{{kiken_numbers.join(',')}}</p>
         <p class="h5" v-else>なし</p>
-      </div>
-      <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button>
-      <div>
+      </div> -->
+      <!-- <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button> -->
+      <!-- <div>
         {{tiles}}
-      </div>
+      </div> -->
     </div>
-  </div>
+    <!-- </div> -->
+  <!-- </div> -->
 </template>
 
 <style>
 .tiles {
   display:inline-block;
-  margin-right: 40px;
+  margin-right: 5px;
 }
 
-.card{
+.tile {
+  width: 50px
+}
+
+/* .card{
     margin-bottom: 10px;
-}
+} */
 
-.suji {
+/* .suji {
   padding: 5px;
 }
 
@@ -135,19 +149,6 @@ span {
 
 .selected {
   color: green;
-}
-
-.anpai {
-  color: blue;
-}
-
-.kiken {
-  color: red;
-}
-
-.big-checkbox {
-  width: 20px;
-  height: 20px;
-}
+} */
 
 </style>
