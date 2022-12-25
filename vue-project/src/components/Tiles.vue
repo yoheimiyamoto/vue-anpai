@@ -10,15 +10,15 @@ export default {
   } {
     return {
       tiles: [
-        { id: id++, text: 1, selected: false, anpai: false,  kiken: false},
-        { id: id++, text: 2, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 3, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 4, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 5, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 6, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 7, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 8, selected: false, anpai: false,  kiken: false },
-        { id: id++, text: 9, selected: false, anpai: false,  kiken: false }
+        { id: id++, text: 1, selected: false, anpai: false,  kiken: false, status: ''},
+        { id: id++, text: 2, selected: false, anpai: false,  kiken: false, status: '',  },
+        { id: id++, text: 3, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 4, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 5, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 6, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 7, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 8, selected: false, anpai: false,  kiken: false, status: '' },
+        { id: id++, text: 9, selected: false, anpai: false,  kiken: false, status: '' }
       ],
 
       safe_numbers: [],
@@ -59,6 +59,17 @@ export default {
           found.anpai = true
         }
       }
+
+      // status設定
+      this.tiles.forEach(function(tile){
+        if (tile.selected) {
+          tile.status = 'selected'
+        } else if (tile.anpai) {
+          this.status = 'anpai'
+        } else {
+          this.status = 'kiken'
+        }
+      })
     },
 
     // 選択した牌をすべて未選択に変更
@@ -79,7 +90,7 @@ export default {
     <div class="card-body">
       <h5 class="card-title"><slot></slot></h5>
       <div class="tiles" v-for="tile in tiles" :key="tile.id">
-        <button v-bind:class="{selected: tile.selected, kiken: tile.kiken, anpai: tile.anpai}" @click="clickTile(tile)">{{tile.text}}</button>
+        <button v-bind:class="tile.status" @click="clickTile(tile)">{{tile.text}}</button>
       </div>
       <div class="suji">
         <p>安牌</p>
