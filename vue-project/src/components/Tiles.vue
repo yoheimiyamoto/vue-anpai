@@ -99,56 +99,35 @@ export default {
 </script>
 
 <template>
-  <div  style="width: 100%;">
-  <!-- <div class="card" style="width: 1000px;"> -->
-    <!-- <div class="card-body"> -->
-      <!-- <h5 class="card-title"><slot></slot></h5> -->
-      <div class="tiles" v-for="tile in tiles" :key="tile.id">
-        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
+  <div class="container text-center">
+
+    <div class="row">
+      <div class="col" v-for="tile in tiles" :key="tile.id">
+          <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
       </div>
-      <!-- <div class="suji">
-        <p>安牌</p>
-        <p class="h5" v-if="safe_numbers.length">{{safe_numbers.join(',')}}</p>
-        <p class="h5" v-else>なし</p>
-      </div>
-      <div class="suji">
-        <p>危険牌</p>
-        <p class="h5" v-if="kiken_numbers.length">{{kiken_numbers.join(',')}}</p>
-        <p class="h5" v-else>なし</p>
-      </div> -->
-      <!-- <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button> -->
-      <!-- <div>
-        {{tiles}}
-      </div> -->
     </div>
-    <!-- </div> -->
-  <!-- </div> -->
+    <!-- <div class="suji">
+      <p>安牌</p>
+      <p class="h5" v-if="safe_numbers.length">{{safe_numbers.join(',')}}</p>
+      <p class="h5" v-else>なし</p>
+    </div>
+    <div class="suji">
+      <p>危険牌</p>
+      <p class="h5" v-if="kiken_numbers.length">{{kiken_numbers.join(',')}}</p>
+      <p class="h5" v-else>なし</p>
+    </div> -->
+    <!-- <button class="btn btn-primary" @click="clearSelectedTiles">Clear</button> -->
+    <!-- <div>
+      {{tiles}}
+    </div> -->
+  </div>
 </template>
 
 <style>
-.tiles {
-  display:inline-block;
-  margin-right: 5px;
-}
 
 .tile {
-  width: 50px
+  width: 30px;
+  margin: 5px;
 }
-
-/* .card{
-    margin-bottom: 10px;
-} */
-
-/* .suji {
-  padding: 5px;
-}
-
-span {
-  padding: 3px;
-}
-
-.selected {
-  color: green;
-} */
 
 </style>
