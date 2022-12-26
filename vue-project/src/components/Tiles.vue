@@ -103,7 +103,7 @@ export default {
 
     <div class="row">
       <div class="col" v-for="tile in tiles" :key="tile.id">
-          <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
+        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
       </div>
     </div>
     <!-- <div class="suji">
@@ -126,8 +126,10 @@ export default {
 <style>
 
 .tile {
-  width: 30px;
-  margin: 5px;
+  width: 50px;
+}
+.row {
+  margin-bottom: 10px;
 }
 
 </style>
