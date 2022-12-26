@@ -99,7 +99,7 @@ export default {
 </script>
 
 <template>
-  <div class="container text-center">
+  <div class="container-fluid text-center">
 
     <div class="row">
       <div class="col" v-for="tile in tiles" :key="tile.id">
