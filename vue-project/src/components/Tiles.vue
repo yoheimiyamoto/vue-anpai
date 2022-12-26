@@ -126,7 +126,7 @@ export default {
 <style>
 
 .tile {
-  width: 30px;
+  width: 50px;
 }
 .row {
   margin-bottom: 10px;
