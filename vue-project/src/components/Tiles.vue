@@ -103,7 +103,7 @@ export default {
 
     <div class="row">
       <div class="col" v-for="tile in tiles" :key="tile.id">
-        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`">
+        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`" rel="preload">
       </div>
     </div>
     <!-- <div class="suji">
