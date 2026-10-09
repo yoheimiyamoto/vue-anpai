@@ -155,4 +155,19 @@ export default {
   width: 100%;
 }
 
+/* スマホの横画面では、3段すべてが画面に収まる範囲で牌をめいっぱい大きくする */
+@media (orientation: landscape) and (max-height: 500px) {
+  .tile-row {
+    /* 牌の幅 = 次の小さい方
+       - 横: (画面幅 - 左右余白24px - 間隔4px×8) / 9枚
+       - 縦: (画面高さ - 上下余白16px(main.css) - 段の間隔4px×3) / 3段 を縦横比143:197で幅に換算 */
+    grid-template-columns: repeat(9, min((100vw - 56px) / 9, (100vh - 28px) / 3 * 143 / 197));
+    grid-template-columns: repeat(9, min((100vw - 56px) / 9, (100dvh - 28px) / 3 * 143 / 197));
+    margin-bottom: 4px;
+  }
+  .tile {
+    display: block;
+  }
+}
+
 </style>

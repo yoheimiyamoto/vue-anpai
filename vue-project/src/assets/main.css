@@ -27,3 +27,10 @@ a,
     padding: 1rem 0;
   }
 }
+
+/* スマホの横画面では3段すべてが画面に収まるよう上下の余白も詰める（Tiles.vueの牌サイズ計算と対応） */
+@media (orientation: landscape) and (max-height: 500px) {
+  #app {
+    padding: 8px 0;
+  }
+}
