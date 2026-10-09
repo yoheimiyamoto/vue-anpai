@@ -119,8 +119,8 @@ export default {
 <template>
   <div class="container-fluid text-center">
 
-    <div class="row gx-1">
-      <div class="col" v-for="tile in tiles" :key="tile.id">
+    <div class="tile-row">
+      <div v-for="tile in tiles" :key="tile.id">
         <img class="tile" @click="clickTile(tile)" :src="imagePath(tile.status, tile)" rel="preload">
       </div>
     </div>
@@ -143,13 +143,16 @@ export default {
 
 <style>
 
-/* スマホなど画面幅が狭いときは9枚が1行に収まるよう縮小する */
+/* 牌9枚を1行に並べる。画面が広いときは間隔を空けずに中央へ寄せ、狭いときは9枚が収まるよう縮小する */
+.tile-row {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 50px));
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 10px;
+}
 .tile {
   width: 100%;
-  max-width: 50px;
-}
-.row {
-  margin-bottom: 10px;
 }
 
 </style>
