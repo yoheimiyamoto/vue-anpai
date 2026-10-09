@@ -119,7 +119,7 @@ export default {
 <template>
   <div class="container-fluid text-center">
 
-    <div class="row">
+    <div class="row gx-1">
       <div class="col" v-for="tile in tiles" :key="tile.id">
         <img class="tile" @click="clickTile(tile)" :src="imagePath(tile.status, tile)" rel="preload">
       </div>
@@ -143,8 +143,10 @@ export default {
 
 <style>
 
+/* スマホなど画面幅が狭いときは9枚が1行に収まるよう縮小する */
 .tile {
-  width: 50px;
+  width: 100%;
+  max-width: 50px;
 }
 .row {
   margin-bottom: 10px;
