@@ -2,6 +2,9 @@
 import {get_anpai, get_kiken_hai} from '../helpers/suji'
 let id: number = 0
 
+// 先読みした画像がキャッシュから破棄されないよう参照を保持しておく
+const preloaded_images: HTMLImageElement[] = []
+
 export default {
   props: {
     tile_type: Number
@@ -30,7 +33,22 @@ export default {
     }
   },
 
+  mounted() {
+    // クリック時に画像の読み込み待ちで色の切り替えが遅れないよう、default以外の画像を先読みする
+    for (const status of ['selected', 'safe', 'danger']) {
+      for (const tile of this.tiles) {
+        const image = new Image()
+        image.src = this.imagePath(status, tile)
+        preloaded_images.push(image)
+      }
+    }
+  },
+
   methods: {
+    imagePath(status: string, tile: any): string {
+      return `./images/${this.tile_type}/${status}/${tile.img}`
+    },
+
     clickTile(tile) {
       tile.selected = ! tile.selected
 
@@ -103,7 +121,7 @@ export default {
 
     <div class="row">
       <div class="col" v-for="tile in tiles" :key="tile.id">
-        <img class="tile" @click="clickTile(tile)" :src="`./images/${tile_type}/${tile.status}/${tile.img}`" rel="preload">
+        <img class="tile" @click="clickTile(tile)" :src="imagePath(tile.status, tile)" rel="preload">
       </div>
     </div>
     <!-- <div class="suji">
