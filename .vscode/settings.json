@@ -1,0 +1,5 @@
+{
+  // VS Code内蔵のTypeScriptではなく、ビルドと同じプロジェクトのTypeScriptでエラーを表示する
+  "typescript.tsdk": "vue-project/node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true
+}
