@@ -26,3 +26,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+# 当たり率計測のレポート
+analysis/out/
