@@ -1,29 +1,3 @@
-// 安牌の取得
-export function get_anpai (numbers: number[]): number[] {
-  /*
-  Args:
-    numbers: List[int] 捨て牌
-  Returns:
-    List[int] 安牌 
-  */
-
-  let safe_numbers: number[] = [] 
-
-  // 表スジ
-  const omote_suji = get_omote_suji(numbers)
-
-  // 中スジ
-  const naka_suji = get_naka_suji(numbers)
-
-  // スジを結合
-  safe_numbers = safe_numbers.concat(...omote_suji, ...naka_suji)
-
-  return safe_numbers.sort()
-
-  // 頻出頻度が高い順に並び替え
-  // return frequency_sort(safe_numbers)
-}
-
 // 表スジの取得
 export function get_omote_suji(numbers: number[]): Set<number> {
   const safe_numbers = new Set<number>()
@@ -64,67 +38,6 @@ export function get_naka_suji(numbers: number[]): Set<number> {
 
   return safe_numbers
 }
-
-// 方スジの取得
-// 確率が低いので除外
-
-// 危険牌の取得
-export function get_kiken_hai (numbers: number[]): number[] {
-  let kiken_numbers: number[] = [] 
-
-  numbers = kiken_numbers.concat(...get_ura_suji(numbers), ...get_matagi_suji(numbers))
-  
-  return numbers.sort()
-}
-
-// 裏スジの取得
-export function get_ura_suji(numbers: number[]): Set<number> {
-  const kiken_numbers = new Set<number>()
-
-  let rules: { [name: number]: number[] } = {
-    1: [2,5],
-    2: [3,6],
-    3: [4,7],
-    4: [5,8],
-    5: [1,4,6,9],
-    6: [2,5],
-    7: [3,6],
-    8: [4,7],
-    9: [5,8]
-  }
-
-  numbers.forEach(function (p) {
-    if (p in rules) {
-      rules[p].forEach(kiken_number => kiken_numbers.add(kiken_number))
-    }
-  })
-
-  return kiken_numbers
-}
-
-// 跨ぎスジの取得
-export function get_matagi_suji(numbers: number[]): Set<number> {
-  const kiken_numbers = new Set<number>()
-
-  let rules: { [name: number]: number[] } = {
-    2: [1,4],
-    3: [1,2,4,5],
-    4: [2,3,5,6],
-    5: [3,4,6,7],
-    6: [4,5,7,8],
-    7: [5,6,8,9],
-    8: [6,9],
-  }
-
-  numbers.forEach(function (p) {
-    if (p in rules) {
-      rules[p].forEach(kiken_number => kiken_numbers.add(kiken_number))
-    }
-  })
-
-  return kiken_numbers
-}
-
 
 /* ToDo: 実装が汚いので後できれいにする */
 export function frequency_sort(numbers: number[]): number[] {

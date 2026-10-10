@@ -88,8 +88,17 @@ li + li {
 .numbers.safe {
   background-color: #007aff;
 }
+/* 薄い青・薄い赤の牌は背景が淡いので、文字は読みやすいよう牌の絵柄より濃い色にする */
+.numbers.likely_safe {
+  background-color: #c7e2ff;
+  color: #0050a0;
+}
 .numbers.danger {
   background-color: #ff3b30;
+}
+.numbers.caution {
+  background-color: #ffd2ce;
+  color: #b3261e;
 }
 
 /* スマホの横画面は牌で画面がいっぱいなので表示しない */

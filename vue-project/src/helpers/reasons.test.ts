@@ -1,44 +1,37 @@
 import { describe, it, expect } from 'vitest';
 import {get_reasons} from './reasons';
-import {get_anpai, get_kiken_hai} from './suji';
+import {get_tile_statuses} from './waits';
 
 describe('get_reasons', () => {
   it('何も選択していなければ理由はない', () => {
     expect(get_reasons([])).toEqual([])
   })
 
-  it('表スジ・裏スジ・跨ぎスジ', () => {
+  it('表スジ・両面待ちの残り数', () => {
     expect(get_reasons([4])).toEqual([
-      { status: 'safe', numbers: [1,7], title: '4の表スジ' },
-      { status: 'danger', numbers: [5,8], title: '4の裏スジ' },
-      { status: 'danger', numbers: [2,3,5,6], title: '4の跨ぎスジ' },
+      { status: 'safe', numbers: [1], title: '4の表スジ（単騎・シャンポンのみ）' },
+      { status: 'likely_safe', numbers: [7], title: '4の表スジ' },
+      { status: 'danger', numbers: [5,6], title: '両面待ちが2通り残っている' },
+      { status: 'caution', numbers: [2,3,8,9], title: '両面待ちが1通り残っている' },
     ])
   })
 
   it('中スジ', () => {
-    expect(get_reasons([1,7])).toContainEqual({ status: 'safe', numbers: [4], title: '1と7の中スジ' })
-  })
-
-  it('別の色で表示される牌は理由から除く', () => {
-    // 4,5を選択 => 1,2,7,8が安牌（青）
-    const reasons = get_reasons([4,5])
-    // 4の裏スジ5・8は、選択（緑）と安牌（青）なので理由に出さない
-    expect(reasons.map(r => r.title)).not.toContain('4の裏スジ')
-    // 5の裏スジ1・4・6・9のうち、1（安牌）と4（選択）を除く
-    expect(reasons.find(r => r.title == '5の裏スジ')?.numbers).toEqual([6,9])
+    expect(get_reasons([1,7])).toContainEqual({ status: 'likely_safe', numbers: [4], title: '1と7の中スジ' })
   })
 
   it('理由に挙げた牌は画面の色分けと一致する', () => {
     // 1〜9の選択の全組み合わせ
     for (let mask = 0; mask < 512; mask++) {
       const selected = [1,2,3,4,5,6,7,8,9].filter((_, i) => mask & (1 << i))
-      const safe = get_anpai(selected).filter(n => !selected.includes(n))
-      const danger = get_kiken_hai(selected).filter(n => !selected.includes(n) && !safe.includes(n))
+      const statuses = get_tile_statuses(selected)
+      const tiles_of = (status: string) => new Set([1,2,3,4,5,6,7,8,9].filter(n => statuses[n] == status))
 
       const reasons = get_reasons(selected)
       const numbers_of = (status: string) => new Set(reasons.filter(r => r.status == status).flatMap(r => r.numbers))
-      expect(numbers_of('safe')).toEqual(new Set(safe))
-      expect(numbers_of('danger')).toEqual(new Set(danger))
+      for (const status of ['safe', 'likely_safe', 'caution', 'danger']) {
+        expect(numbers_of(status)).toEqual(tiles_of(status))
+      }
     }
   })
 })
