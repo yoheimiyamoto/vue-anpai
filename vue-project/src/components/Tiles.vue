@@ -10,6 +10,9 @@ export default {
     tile_type: Number
   },
 
+  // 選択（捨て牌）が変わったときに、選択中の牌の番号を通知する
+  emits: ['change'],
+
   data(): {
     tiles: any
     safe_numbers: number[]
@@ -101,6 +104,8 @@ export default {
           tile.status = 'danger'
         }
       })
+
+      this.$emit('change', selected_number)
     },
 
     // 選択した牌をすべて未選択に変更
