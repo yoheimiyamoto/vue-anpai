@@ -1,24 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import {get_reasons, ura_suji_shapes, matagi_suji_shapes} from './reasons';
-import {get_anpai, get_kiken_hai, get_ura_suji, get_matagi_suji} from './suji';
-
-const waits_of = (shapes: { waits: number[] }[]) => new Set<number>(shapes.flatMap(s => s.waits))
-
-describe('ura_suji_shapes', () => {
-  it('待ちが裏スジの判定と一致する', () => {
-    for (let n = 1; n <= 9; n++) {
-      expect(waits_of(ura_suji_shapes(n))).toEqual(get_ura_suji([n]))
-    }
-  })
-})
-
-describe('matagi_suji_shapes', () => {
-  it('待ちが跨ぎスジの判定と一致する', () => {
-    for (let n = 1; n <= 9; n++) {
-      expect(waits_of(matagi_suji_shapes(n))).toEqual(get_matagi_suji([n]))
-    }
-  })
-})
+import {get_reasons} from './reasons';
+import {get_anpai, get_kiken_hai} from './suji';
 
 describe('get_reasons', () => {
   it('何も選択していなければ理由はない', () => {
@@ -27,16 +9,14 @@ describe('get_reasons', () => {
 
   it('表スジ・裏スジ・跨ぎスジ', () => {
     expect(get_reasons([4])).toEqual([
-      { status: 'safe', numbers: [1,7], title: '4の表スジ', detail: '4が切られているので、1-4待ち・4-7待ちの両面はフリテン。両面待ちには当たらない' },
-      { status: 'danger', numbers: [5,8], title: '4の裏スジ', detail: '467から4を切ると67が残り5-8待ちになりうる' },
-      { status: 'danger', numbers: [2,3,5,6], title: '4の跨ぎスジ', detail: '344から4を切ると34が残り2-5待ち、445から4を切ると45が残り3-6待ちになりうる' },
+      { status: 'safe', numbers: [1,7], title: '4の表スジ' },
+      { status: 'danger', numbers: [5,8], title: '4の裏スジ' },
+      { status: 'danger', numbers: [2,3,5,6], title: '4の跨ぎスジ' },
     ])
   })
 
   it('中スジ', () => {
-    expect(get_reasons([1,7])).toContainEqual(
-      { status: 'safe', numbers: [4], title: '1と7の中スジ', detail: '1と7が両方切られているので、1-4待ち・4-7待ちの両面はどちらもフリテン。両面待ちには当たらない' }
-    )
+    expect(get_reasons([1,7])).toContainEqual({ status: 'safe', numbers: [4], title: '1と7の中スジ' })
   })
 
   it('別の色で表示される牌は理由から除く', () => {

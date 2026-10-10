@@ -35,7 +35,6 @@ export default {
 
 <template>
   <div class="reasons">
-    <p class="text-muted text-center" v-if="!suits.length">捨て牌をタップすると、ここに判定理由が表示されます</p>
     <section v-for="suit in suits" :key="suit.tile_type">
       <h2 class="h6 fw-bold">{{ suit.name }}（捨て牌: {{ suit.discards.join('・') }}）</h2>
       <p class="text-muted" v-if="!suit.reasons.length">スジ・危険牌なし</p>
@@ -43,7 +42,6 @@ export default {
         <li v-for="reason in suit.reasons" :key="reason.title">
           <span class="numbers" :class="reason.status">{{ reason.numbers.join('・') }}</span>
           <span class="fw-bold">{{ reason.title }}</span>
-          <p class="detail text-muted">{{ reason.detail }}</p>
         </li>
       </ul>
     </section>
@@ -92,10 +90,6 @@ li + li {
 }
 .numbers.danger {
   background-color: #ff3b30;
-}
-.detail {
-  margin: 2px 0 0;
-  font-size: 13px;
 }
 
 /* スマホの横画面は牌で画面がいっぱいなので表示しない */
