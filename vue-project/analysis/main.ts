@@ -62,7 +62,6 @@ for (const log of read_game_logs(path)) {
   }
 }
 
-const strategy = tally.strategy()
 const html = render_report({
   source: basename(path),
   games,
@@ -74,16 +73,13 @@ const html = render_report({
   ron_mismatches: tally.ron_mismatches,
   missed_rons: tally.missed_rons,
   rows: tally.row_stats(),
-  strategy,
 }, tile_image_css(new URL('../public/images/', import.meta.url)))
 
 mkdirSync(dirname(resolve(out)), { recursive: true })
 writeFileSync(out, html)
 
 console.log(`${games} 半荘（読めなかった ${skipped_games}）・リーチ ${riichis}・場面 ${tally.scenes}`)
-tally.row_stats().forEach(s => console.log(`${s.row}\t母数 ${s.n}\t当たり ${s.hits}\t${s.n ? (s.hits / s.n * 100).toFixed(1) : '-'}%`))
-console.log(`切る順番: ${strategy.order.join(' → ')}`)
-console.log(`シミュレーター通りに切ったときの1打ごとの振込率: ${(strategy.deal_ins / strategy.decisions * 100).toFixed(2)}%`)
+tally.row_stats().forEach(s => console.log(`${s.row}\t母数 ${s.n}\t振り込み ${s.hits}\t${s.n ? (s.hits / s.n * 100).toFixed(1) : '-'}%`))
 console.log(`確認: ロンと判定の食い違い ${tally.ron_mismatches}・見逃し ${tally.missed_rons}・待ちのないリーチ ${riichis_without_waits}`)
 errors.forEach(e => console.error(e))
 console.log(`レポート: ${resolve(out)}`)

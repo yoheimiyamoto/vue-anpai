@@ -24,17 +24,18 @@ function make_data(): ReportData {
   return {
     source: 'tenhou-houou-2025.tar', games: 1, skipped_games: 0, kyokus: 8, riichis: 3, riichis_without_waits: 0,
     scenes: tally.scenes, ron_mismatches: tally.ron_mismatches, missed_rons: tally.missed_rons,
-    rows: tally.row_stats(), strategy: tally.strategy(),
+    rows: tally.row_stats(),
   }
 }
 
 describe('render_report', () => {
-  it('当たり率の表と振込率を含み、実例は載せない', () => {
+  it('色ごとの振込率の表だけを載せ、シミュレーター通りの振込率と実例は載せない', () => {
     const html = render_report(make_data(), '')
+    expect(html).toContain('<h2>色ごとの振込率</h2>')
     expect(html).toContain('<table class="rates">')
-    expect(html).toContain('1打ごとの振込率')
+    expect(html).not.toContain('当たり率')
+    expect(html).not.toContain('シミュレーターに従って')
     expect(html).not.toContain('実例')
-    expect(html).not.toContain('tenhou.net')
   })
 
   it('見逃しの数に、場面全体に占める割合と理由を添える', () => {

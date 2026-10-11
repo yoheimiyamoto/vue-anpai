@@ -49,13 +49,6 @@ export function get_candidates(scene: Scene): Candidate[] {
 
 export type RowStat = { row: Row, n: number, hits: number }
 
-export type StrategyStat = {
-  order: Row[]       // 切る順番（当たり率の低い順）
-  decisions: number  // 場面の数
-  deal_ins: number   // 振り込みの数（同じ行に複数あるときは平均なので小数になる）
-  by_row: { row: Row, decisions: number, deal_ins: number }[]  // 切ることになった行ごと（order の順）
-}
-
 export class Tally {
   scenes = 0
   ron_mismatches = 0  // 牌譜ではリーチ者がロンしたのに、判定が当たりでなかった打牌
@@ -63,30 +56,17 @@ export class Tally {
 
   private n = ROWS.map(() => 0)
   private hits = ROWS.map(() => 0)
-  // 場面の形（行ごとの「手にある種類数」と「そのうち当たりの数」）ごとの場面の数
-  // シミュレーターに従ったときの振込率は形だけで決まるので、切る順番が決まってからここで計算する
-  private shapes = new Map<string, number>()
 
   add(scene: Scene) {
     this.scenes++
 
-    const n = ROWS.map(() => 0)
-    const hits = ROWS.map(() => 0)
     get_candidates(scene).forEach(c => {
       const r = ROWS.indexOf(c.row)
-      n[r]++
+      this.n[r]++
       if (c.hit) {
-        hits[r]++
+        this.hits[r]++
       }
     })
-
-    ROWS.forEach((_, r) => {
-      this.n[r] += n[r]
-      this.hits[r] += hits[r]
-    })
-
-    const key = [...n, ...hits].join(',')
-    this.shapes.set(key, (this.shapes.get(key) ?? 0) + 1)
 
     const hit = is_hit(scene, scene.discarded)
     if (scene.ronned && !hit) {
@@ -99,35 +79,5 @@ export class Tally {
 
   row_stats(): RowStat[] {
     return ROWS.map((row, r) => ({ row, n: this.n[r], hits: this.hits[r] }))
-  }
-
-  // 当たり率の低い順。母数0の行は最後、同じ当たり率なら ROWS の順
-  order(): Row[] {
-    const rate = (s: RowStat) => s.n ? s.hits / s.n : Infinity
-    return this.row_stats()
-      .sort((a, b) => rate(a) == rate(b) ? 0 : rate(a) < rate(b) ? -1 : 1)
-      .map(s => s.row)
-  }
-
-  strategy(): StrategyStat {
-    const order = this.order()
-    const order_indexes = order.map(row => ROWS.indexOf(row))
-    const by_row = ROWS.map(row => ({ row: row as Row, decisions: 0, deal_ins: 0 }))
-    let decisions = 0
-    let deal_ins = 0
-
-    this.shapes.forEach((count, key) => {
-      const values = key.split(',').map(Number)
-      const n = values.slice(0, ROWS.length)
-      const hits = values.slice(ROWS.length)
-      const r = order_indexes.find(r => n[r] > 0)!
-      const deal_in = hits[r] / n[r] * count
-      decisions += count
-      deal_ins += deal_in
-      by_row[r].decisions += count
-      by_row[r].deal_ins += deal_in
-    })
-
-    return { order, decisions, deal_ins, by_row: order_indexes.map(r => by_row[r]) }
   }
 }

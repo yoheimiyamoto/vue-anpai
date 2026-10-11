@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs'
 import type { TileStatus } from '../src/helpers/waits'
-import type { Row, RowStat, StrategyStat } from './tally'
+import type { Row, RowStat } from './tally'
 import { is_honor, suit_of, number_of, tile_label } from './tiles'
 
 // レポートに載せる集計結果
@@ -15,7 +15,6 @@ export type ReportData = {
   ron_mismatches: number
   missed_rons: number
   rows: RowStat[]
-  strategy: StrategyStat
 }
 
 // 行に対応する牌画像の色（字牌の行は画像がないので default の見た目）
@@ -60,41 +59,23 @@ function tile_html(tile: number, status: TileStatus = 'default'): string {
     : `<span class="tile tile-${suit_of(tile)}-${number_of(tile)}-${status}" title="${label}"></span>`
 }
 
-// 色ごとの当たり率（表の右端に横棒を描く）
+// 色ごとの振込率（表の右端に横棒を描く）
 function rates_html(rows: RowStat[]): string {
   const max = Math.max(...rows.map(s => s.n ? s.hits / s.n : 0), 0.0001)
   const body = rows.map(s => {
     const rate = s.n ? s.hits / s.n : 0
     // 行の色の見本: 字牌の行は東、それ以外は 5萬 をその色で出す
     const sample = s.row == '字牌' ? tile_html(27) : tile_html(4, STATUS_OF_ROW[s.row])
-    return `<tr title="${s.row}: 母数 ${count(s.n)}・当たり ${count(s.hits)}">`
+    return `<tr title="${s.row}: 母数 ${count(s.n)}・振り込み ${count(s.hits)}">`
       + `<th scope="row"><span class="row-name">${sample}${s.row}</span></th>`
       + `<td class="num">${count(s.n)}</td><td class="num">${count(s.hits)}</td><td class="num">${rate_text(s.hits, s.n)}</td>`
       + `<td class="bar-cell"><span class="bar" style="width:${(rate / max * 100).toFixed(1)}%"></span></td>`
       + `</tr>`
   }).join('\n')
   return `<table class="rates">
-<thead><tr><th scope="col">行</th><th scope="col" class="num">母数</th><th scope="col" class="num">当たり</th><th scope="col" class="num">当たり率</th><th scope="col" class="bar-cell"></th></tr></thead>
+<thead><tr><th scope="col">行</th><th scope="col" class="num">母数</th><th scope="col" class="num">振り込み</th><th scope="col" class="num">振込率</th><th scope="col" class="bar-cell"></th></tr></thead>
 <tbody>
 ${body}
-</tbody>
-</table>`
-}
-
-// シミュレーターに従って切ったときの振込率
-function strategy_html(strategy: StrategyStat): string {
-  const total = strategy.decisions
-  const rows = strategy.by_row.filter(r => r.decisions).map(r => `<tr>`
-    + `<th scope="row">${r.row}</th>`
-    + `<td class="num">${count(r.decisions)}</td><td class="num">${rate_text(r.decisions, total)}</td>`
-    + `<td class="num">${rate_text(r.deal_ins, r.decisions)}</td>`
-    + `</tr>`).join('\n')
-  return `<p class="order">切る順番: ${strategy.order.join(' → ')}</p>
-<div class="hero"><span class="hero-number">${rate_text(strategy.deal_ins, total)}</span><span class="hero-label">1打ごとの振込率（${count(total)} 打）</span></div>
-<table>
-<thead><tr><th scope="col">切ることになった行</th><th scope="col" class="num">回数</th><th scope="col" class="num">割合</th><th scope="col" class="num">その行での振込率</th></tr></thead>
-<tbody>
-${rows}
 </tbody>
 </table>`
 }
@@ -163,10 +144,6 @@ thead th { color: var(--text-muted); font-size: 0.85rem; }
 .row-name { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
 .row-name .tile { width: 18px; }
 .row-name .tile.honor { font-size: 11px; line-height: 25px; }
-.order { font-weight: 700; }
-.hero { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin: 16px 0; }
-.hero-number { font-size: 2.5rem; font-weight: 700; }
-.hero-label { color: var(--text-muted); }
 .tile { display: inline-block; width: 30px; aspect-ratio: 143 / 197; background-size: cover; border-radius: 3px; vertical-align: middle; }
 .tile.honor { background: var(--honor); color: #0b0b0b; text-align: center; font-weight: 700; font-size: 18px; line-height: 41px; }
 @media (max-width: 560px) {
@@ -180,7 +157,7 @@ export function render_report(data: ReportData, image_css: string): string {
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>安牌シミュレーター当たり率</title>
+<title>安牌シミュレーター振込率</title>
 <style>
 ${STYLE}
 ${image_css}
@@ -188,23 +165,17 @@ ${image_css}
 </head>
 <body>
 <main>
-<h1>安牌シミュレーターの当たり率</h1>
+<h1>安牌シミュレーターの振込率</h1>
 
 <section>
 <h2>概要</h2>
 <p>天鳳鳳凰卓の牌譜 <code>${escape_html(data.source)}</code> から、${count(data.games)} 半荘・${count(data.kyokus)} 局を読み込みました。成立したリーチは ${count(data.riichis)} 回、対象の場面（リーチ者が1人のときに、ほかの人が牌を切る直前）は ${count(data.scenes)} 回です。</p>
-<p class="muted">当たり率は、対象の場面で切る人の手にある牌（同じ牌は1回）を「切ったらリーチ者に当たるか」で数えたものです。色はリーチ者の捨て牌だけを使い、アプリと同じ判定で付けています。</p>
+<p class="muted">振込率は、対象の場面で切る人の手にある牌（同じ牌は1回）を「切ったらリーチ者に振り込むか」で数えたものです。実際に切った牌だけでなく、手にある牌すべてを「もし切ったら」で数えています。色はリーチ者の捨て牌だけを使い、アプリと同じ判定で付けています。</p>
 </section>
 
 <section>
-<h2>色ごとの当たり率</h2>
+<h2>色ごとの振込率</h2>
 ${rates_html(data.rows)}
-</section>
-
-<section>
-<h2>シミュレーターに従って切ったときの振込率</h2>
-<p class="muted">上の表で当たり率が低い行から順に、手にある一番安全な行の牌を切ったときに、その1打で振り込む確率です。同じ行の牌が複数あるときは平均をとっています。</p>
-${strategy_html(data.strategy)}
 </section>
 
 <section>

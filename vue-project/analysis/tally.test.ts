@@ -51,25 +51,12 @@ describe('get_candidates', () => {
 })
 
 describe('Tally', () => {
-  it('行ごとに母数と当たりを数え、当たり率の低い順に並べる（母数0の行は最後）', () => {
+  it('行ごとに母数と当たりを数える', () => {
     const tally = new Tally()
     tally.add(make_scene({ hand: '1m 5m 8m 9m E', riichi_discards: '4m', waits: '5m 8m' }))
     tally.add(make_scene({ hand: '2m 3m 8m', riichi_discards: '4m', waits: '2m' }))
     const stats = Object.fromEntries(tally.row_stats().map(s => [s.row, [s.n, s.hits]]))
     expect(stats).toEqual({ 現物: [0, 0], 濃い青: [1, 0], 薄い青: [0, 0], 薄い赤: [5, 2], 濃い赤: [1, 1], 無地: [0, 0], 字牌: [1, 0] })
-    expect(tally.order()).toEqual(['濃い青', '字牌', '薄い赤', '濃い赤', '現物', '薄い青', '無地'])
-  })
-
-  it('シミュレーター通りに切ったときの振込率（同じ行に複数あれば平均）', () => {
-    const tally = new Tally()
-    tally.add(make_scene({ hand: '1m 5m 8m 9m E', riichi_discards: '4m', waits: '5m 8m' }))  // 濃い青の1mを切る → 0
-    tally.add(make_scene({ hand: '2m 3m 8m', riichi_discards: '4m', waits: '2m' }))          // 薄い赤3種類のうち1つが当たり → 1/3
-    const strategy = tally.strategy()
-    expect(strategy.order).toEqual(tally.order())
-    expect(strategy.decisions).toBe(2)
-    expect(strategy.deal_ins).toBeCloseTo(1 / 3)
-    expect(strategy.by_row.find(r => r.row == '濃い青')).toEqual({ row: '濃い青', decisions: 1, deal_ins: 0 })
-    expect(strategy.by_row.find(r => r.row == '薄い赤')!.deal_ins).toBeCloseTo(1 / 3)
   })
 
   it('牌譜のロンと判定の食い違い・見逃しを数える', () => {
