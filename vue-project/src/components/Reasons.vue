@@ -1,6 +1,6 @@
 <script lang="ts">
 import {get_reasons} from '../helpers/reasons'
-import {rate_text_of_status, type ReportData} from '../helpers/report'
+import {rate_text_of_status, sort_by_rate, type ReportData} from '../helpers/report'
 import report_json from '../data/report.json'
 
 // 天鳳鳳凰卓の牌譜で計測した色ごとの振込率（/report と同じ数字）
@@ -31,7 +31,8 @@ export default {
           tile_type,
           name: suit_names[tile_type],
           discards: [...this.selected_numbers[tile_type]].sort((a: number, b: number) => a - b),
-          reasons: get_reasons(this.selected_numbers[tile_type]),
+          // 振込率の低い（安全な）理由から順に並べる
+          reasons: sort_by_rate(get_reasons(this.selected_numbers[tile_type]), report.rows),
         }))
     }
   },

@@ -51,3 +51,12 @@ export function rate_text_of_status(rows: RowStat[], status: string): string {
   const stat = rows.find(s => s.row == ROW_OF_STATUS[status])
   return stat ? rate_text(stat.hits, stat.n) : '-'
 }
+
+// 理由を振込率の低い順に並べる（同じ振込率なら元の順。集計結果にない色は最後）
+export function sort_by_rate<T extends { status: string }>(reasons: T[], rows: RowStat[]): T[] {
+  const rate = (reason: T) => {
+    const stat = rows.find(s => s.row == ROW_OF_STATUS[reason.status])
+    return stat && stat.n ? stat.hits / stat.n : Infinity
+  }
+  return [...reasons].sort((a, b) => rate(a) == rate(b) ? 0 : rate(a) < rate(b) ? -1 : 1)
+}
