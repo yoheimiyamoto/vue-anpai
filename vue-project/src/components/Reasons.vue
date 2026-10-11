@@ -53,7 +53,7 @@ export default {
       <ul>
         <li v-for="reason in suit.reasons" :key="reason.title">
           <span class="numbers" :class="reason.status">{{ reason.numbers.join('・') }}</span>
-          <span class="fw-bold">{{ reason.title }}</span>（振込率{{ rate(reason.status) }}）
+          <span class="fw-bold">{{ reason.title }}</span>（{{ rate(reason.status) }}）
         </li>
       </ul>
     </section>
