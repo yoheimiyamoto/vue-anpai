@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { classify, is_hit, get_candidates, choose, Tally, Reservoir, seeded_random, ROWS } from './tally'
+import { classify, is_hit, get_candidates, Tally } from './tally'
 import { tile_id } from './tiles'
 import type { Scene } from './replay'
 
@@ -50,13 +50,6 @@ describe('get_candidates', () => {
   })
 })
 
-describe('choose', () => {
-  it('順番の中で、手にある最初の行の牌をすべて返す', () => {
-    const candidates = get_candidates(make_scene({ hand: '2m 8m 5m', riichi_discards: '4m', waits: '2m' }))
-    expect(choose(candidates, ['現物', '濃い青', '薄い赤', '濃い赤']).map(c => c.tile)).toEqual(tiles('2m 8m'))
-  })
-})
-
 describe('Tally', () => {
   it('行ごとに母数と当たりを数え、当たり率の低い順に並べる（母数0の行は最後）', () => {
     const tally = new Tally()
@@ -77,15 +70,6 @@ describe('Tally', () => {
     expect(strategy.deal_ins).toBeCloseTo(1 / 3)
     expect(strategy.by_row.find(r => r.row == '濃い青')).toEqual({ row: '濃い青', decisions: 1, deal_ins: 0 })
     expect(strategy.by_row.find(r => r.row == '薄い赤')!.deal_ins).toBeCloseTo(1 / 3)
-    expect(tally.strategy_examples(3).map(s => s.hand)).toEqual([tiles('2m 3m 8m')])
-  })
-
-  it('行ごとに、その行の牌が当たりだった場面を残す', () => {
-    const tally = new Tally()
-    const scene = make_scene({ hand: '1m 5m 8m 9m E', riichi_discards: '4m', waits: '5m 8m' })
-    tally.add(scene)
-    expect(tally.row_examples[ROWS.indexOf('濃い赤')].items).toEqual([scene])
-    expect(tally.row_examples[ROWS.indexOf('濃い青')].items).toEqual([])
   })
 
   it('牌譜のロンと判定の食い違い・見逃しを数える', () => {
@@ -96,19 +80,5 @@ describe('Tally', () => {
     expect(tally.scenes).toBe(3)
     expect(tally.ron_mismatches).toBe(1)
     expect(tally.missed_rons).toBe(1)
-  })
-})
-
-describe('Reservoir', () => {
-  it('同じシードなら同じものを選び、size 件を超えない', () => {
-    const pick = () => {
-      const reservoir = new Reservoir<number>(3, seeded_random(1))
-      for (let i = 0; i < 100; i++) {
-        reservoir.offer(i)
-      }
-      return reservoir.items
-    }
-    expect(pick()).toHaveLength(3)
-    expect(pick()).toEqual(pick())
   })
 })

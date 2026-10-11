@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render_report, tile_image_css, type ReportData } from './report'
-import { Tally, ROWS } from './tally'
+import { Tally } from './tally'
 import { tile_id } from './tiles'
 import type { Scene } from './replay'
 
@@ -25,22 +25,16 @@ function make_data(): ReportData {
     source: 'tenhou-houou-2025.tar', games: 1, skipped_games: 0, kyokus: 8, riichis: 3, riichis_without_waits: 0,
     scenes: tally.scenes, ron_mismatches: tally.ron_mismatches, missed_rons: tally.missed_rons,
     rows: tally.row_stats(), strategy: tally.strategy(),
-    row_examples: ROWS.filter(row => row != '現物').map(row => ({ row, scenes: tally.row_examples[ROWS.indexOf(row)].items })),
-    strategy_examples: tally.strategy_examples(3),
   }
 }
 
 describe('render_report', () => {
-  it('当たり率の表・振込率・実例を含むHTMLを作る', () => {
+  it('当たり率の表と振込率を含み、実例は載せない', () => {
     const html = render_report(make_data(), '')
     expect(html).toContain('<table class="rates">')
     expect(html).toContain('1打ごとの振込率')
-    expect(html).toContain('href="https://tenhou.net/0/?log=2025010100gm-00a9-0000-test&amp;tw=1&amp;ts=2"')
-    expect(html).toContain('東3局 7巡目')
-    // 切る人の手牌の 2m は薄い赤で、当たり牌の枠が付く
-    expect(html).toContain('class="tile tile-0-2-caution hit"')
-    // リーチ宣言牌（2枚目の S）は横向き
-    expect(html).toContain('class="tile honor default riichi"')
+    expect(html).not.toContain('実例')
+    expect(html).not.toContain('tenhou.net')
   })
 
   it('見逃しの数に、場面全体に占める割合と理由を添える', () => {

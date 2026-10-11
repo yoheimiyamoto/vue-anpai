@@ -2,7 +2,7 @@ import { mkdirSync, writeFileSync } from 'node:fs'
 import { basename, dirname, resolve } from 'node:path'
 import { read_game_logs } from './tar'
 import { replay_game } from './replay'
-import { Tally, ROWS } from './tally'
+import { Tally } from './tally'
 import { render_report, tile_image_css } from './report'
 
 const USAGE = '使い方: npm run analyze -- <tarのパス> [--limit 半荘数] [--out レポートのパス]'
@@ -75,8 +75,6 @@ const html = render_report({
   missed_rons: tally.missed_rons,
   rows: tally.row_stats(),
   strategy,
-  row_examples: ROWS.filter(row => row != '現物').map(row => ({ row, scenes: tally.row_examples[ROWS.indexOf(row)].items })),
-  strategy_examples: tally.strategy_examples(3),
 }, tile_image_css(new URL('../public/images/', import.meta.url)))
 
 mkdirSync(dirname(resolve(out)), { recursive: true })

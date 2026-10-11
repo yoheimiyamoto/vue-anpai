@@ -47,48 +47,6 @@ export function get_candidates(scene: Scene): Candidate[] {
     .map(tile => ({ tile, row: rows[tile], hit: is_hit(scene, tile) }))
 }
 
-// シミュレーターに従って切る牌: order の順で、手にある最初の行の牌（どれを切るかは決まらないので全部）
-export function choose(candidates: Candidate[], order: readonly Row[]): Candidate[] {
-  for (const row of order) {
-    const chosen = candidates.filter(c => c.row == row)
-    if (chosen.length) {
-      return chosen
-    }
-  }
-  return []
-}
-
-// 固定のシードから毎回同じ並びの乱数を出す（mulberry32）
-export function seeded_random(seed: number): () => number {
-  return () => {
-    seed = (seed + 0x6D2B79F5) | 0
-    let t = seed
-    t = Math.imul(t ^ (t >>> 15), t | 1)
-    t ^= t + Math.imul(t ^ (t >>> 7), t | 61)
-    return ((t ^ (t >>> 14)) >>> 0) / 4294967296
-  }
-}
-
-// 全部で何件あるかわからない並びから、size 件を等しい確率で選ぶ（リザーバーサンプリング）
-export class Reservoir<T> {
-  items: T[] = []
-  private seen = 0
-
-  constructor(private size: number, private random: () => number) {}
-
-  offer(item: T) {
-    this.seen++
-    if (this.items.length < this.size) {
-      this.items.push(item)
-    } else {
-      const j = Math.floor(this.random() * this.seen)
-      if (j < this.size) {
-        this.items[j] = item
-      }
-    }
-  }
-}
-
 export type RowStat = { row: Row, n: number, hits: number }
 
 export type StrategyStat = {
@@ -97,9 +55,6 @@ export type StrategyStat = {
   deal_ins: number   // 振り込みの数（同じ行に複数あるときは平均なので小数になる）
   by_row: { row: Row, decisions: number, deal_ins: number }[]  // 切ることになった行ごと（order の順）
 }
-
-const EXAMPLES_PER_ROW = 3
-const HIT_POOL_SIZE = 2000
 
 export class Tally {
   scenes = 0
@@ -111,12 +66,6 @@ export class Tally {
   // 場面の形（行ごとの「手にある種類数」と「そのうち当たりの数」）ごとの場面の数
   // シミュレーターに従ったときの振込率は形だけで決まるので、切る順番が決まってからここで計算する
   private shapes = new Map<string, number>()
-  private random = seeded_random(20251010)
-
-  // 行ごとの、その行の牌が当たりだった場面（ROWS と同じ順）
-  row_examples = ROWS.map(() => new Reservoir<Scene>(EXAMPLES_PER_ROW, this.random))
-  // 当たりの牌が手にあった場面。シミュレーター通りに切ると振り込む実例は、集計後にここから選ぶ
-  private hit_pool = new Reservoir<Scene>(HIT_POOL_SIZE, this.random)
 
   add(scene: Scene) {
     this.scenes++
@@ -134,13 +83,7 @@ export class Tally {
     ROWS.forEach((_, r) => {
       this.n[r] += n[r]
       this.hits[r] += hits[r]
-      if (hits[r]) {
-        this.row_examples[r].offer(scene)
-      }
     })
-    if (hits.some(h => h)) {
-      this.hit_pool.offer(scene)
-    }
 
     const key = [...n, ...hits].join(',')
     this.shapes.set(key, (this.shapes.get(key) ?? 0) + 1)
@@ -186,13 +129,5 @@ export class Tally {
     })
 
     return { order, decisions, deal_ins, by_row: order_indexes.map(r => by_row[r]) }
-  }
-
-  // シミュレーター通りに切ると振り込む場面
-  strategy_examples(count: number): Scene[] {
-    const order = this.order()
-    return this.hit_pool.items
-      .filter(scene => choose(get_candidates(scene), order).some(c => c.hit))
-      .slice(0, count)
   }
 }
