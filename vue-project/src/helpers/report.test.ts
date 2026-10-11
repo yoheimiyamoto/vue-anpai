@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { rate_text, bar_widths, STATUS_OF_ROW } from './report'
+import { rate_text, bar_widths, COLOR_OF_ROW } from './report'
 
 describe('rate_text', () => {
   it('振込率を小数1桁の%で出し、母数が0なら「-」', () => {
@@ -23,10 +23,10 @@ describe('bar_widths', () => {
   })
 })
 
-describe('STATUS_OF_ROW', () => {
-  it('7つの行それぞれに牌画像の色を決める（字牌は画像なし）', () => {
-    expect(STATUS_OF_ROW).toEqual({
-      現物: 'selected', 濃い青: 'safe', 薄い青: 'likely_safe', 薄い赤: 'caution', 濃い赤: 'danger', 無地: 'default', 字牌: null,
+describe('COLOR_OF_ROW', () => {
+  it('7つの行それぞれに、アプリの牌と同じ色を決める（字牌は色なし）', () => {
+    expect(COLOR_OF_ROW).toEqual({
+      現物: '#4cd964', 濃い青: '#007aff', 薄い青: '#c7e2ff', 薄い赤: '#ffd2ce', 濃い赤: '#ff3b30', 無地: '#dddddd', 字牌: null,
     })
   })
 })

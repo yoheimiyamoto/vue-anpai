@@ -1,6 +1,6 @@
 <script lang="ts">
 import report_json from './data/report.json'
-import { STATUS_OF_ROW, rate_text, bar_widths, type ReportData } from './helpers/report'
+import { COLOR_OF_ROW, rate_text, bar_widths, type ReportData } from './helpers/report'
 
 const report = report_json as ReportData
 
@@ -10,19 +10,15 @@ export default {
   },
 
   computed: {
-    // 表の行（振込率の表示、横棒の長さ、色の見本の牌画像）
+    // 表の行（振込率の表示、横棒の長さ、色の見本）
     rows() {
       const widths = bar_widths(report.rows)
-      return report.rows.map((s, i) => {
-        const status = STATUS_OF_ROW[s.row]
-        return {
-          ...s,
-          rate: rate_text(s.hits, s.n),
-          width: widths[i],
-          // 色の見本は5萬（画像フォルダ2）をその色で出す。字牌の行は画像がないので文字で出す
-          image: status ? `${import.meta.env.BASE_URL}images/2/${status}/5.png` : null,
-        }
-      })
+      return report.rows.map((s, i) => ({
+        ...s,
+        rate: rate_text(s.hits, s.n),
+        width: widths[i],
+        color: COLOR_OF_ROW[s.row],
+      }))
     }
   },
 
@@ -61,8 +57,8 @@ export default {
           <tr v-for="row in rows" :key="row.row" :title="`${row.row}: 母数 ${count(row.n)}・振り込み ${count(row.hits)}`">
             <th scope="row">
               <span class="row-name">
-                <img v-if="row.image" class="tile" :src="row.image" alt="">
-                <span v-else class="tile honor">東</span>
+                <!-- 字牌はアプリでも色が付かないので、四角を出さずに位置だけそろえる -->
+                <span class="swatch" :style="{ backgroundColor: row.color ?? 'transparent' }"></span>
                 {{ row.row }}
               </span>
             </th>
@@ -146,20 +142,12 @@ thead th {
   gap: 6px;
   white-space: nowrap;
 }
-.tile {
-  width: 18px;
-  aspect-ratio: 143 / 197;
-  border-radius: 2px;
-}
-/* 字牌は画像がないので、牌の形に文字を描く */
-.tile.honor {
+/* 色の見本（アプリの牌と同じ色の四角） */
+.swatch {
   display: inline-block;
-  background-color: #e6e6e6;
-  color: #333;
-  font-size: 11px;
-  font-weight: bold;
-  line-height: 25px;
-  text-align: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
 }
 
 /* スマホでは横棒を出さず、数字だけにする */

@@ -1,5 +1,3 @@
-import type { TileStatus } from './waits'
-
 // 振込率レポート（/report）に出す集計結果
 // 計測スクリプト（analysis/main.ts）が天鳳の牌譜から集計して src/data/report.json に書き出す
 export type RowStat = {
@@ -17,14 +15,14 @@ export type ReportData = {
   rows: RowStat[]
 }
 
-// 行の色の見本に使う牌画像の色（字牌は画像がないので null）
-export const STATUS_OF_ROW: { [row: string]: TileStatus | null } = {
-  現物: 'selected',
-  濃い青: 'safe',
-  薄い青: 'likely_safe',
-  薄い赤: 'caution',
-  濃い赤: 'danger',
-  無地: 'default',
+// 行の色の見本（アプリの牌画像の色と同じ。字牌はアプリでも色が付かないので null）
+export const COLOR_OF_ROW: { [row: string]: string | null } = {
+  現物: '#4cd964',
+  濃い青: '#007aff',
+  薄い青: '#c7e2ff',
+  薄い赤: '#ffd2ce',
+  濃い赤: '#ff3b30',
+  無地: '#dddddd',
   字牌: null,
 }
 
