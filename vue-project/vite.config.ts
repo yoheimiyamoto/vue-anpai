@@ -19,6 +19,13 @@ export default defineConfig({
   // https://vitejs.dev/config/build-options.html#build-outdir
   build: {
     outDir: '../docs',
+    // トップ（安牌シミュレーター）と /report（振込率レポート）の2ページを出力する
+    rollupOptions: {
+      input: {
+        main: fileURLToPath(new URL('./index.html', import.meta.url)),
+        report: fileURLToPath(new URL('./report/index.html', import.meta.url)),
+      },
+    },
   },
   base: '/vue-anpai/',
 

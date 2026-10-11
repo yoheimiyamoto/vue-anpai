@@ -1,8 +1,8 @@
 # 安牌シミュレーターの振込率計測
 
 天鳳鳳凰卓の牌譜を使って、アプリの色分け（`src/helpers/waits.ts` の `get_tile_statuses`）が
-色ごとにどれくらい振り込むかを計測し、HTMLのレポートにまとめる。
-ローカルで実行するだけで、結果はアプリに組み込まない。
+色ごとにどれくらい振り込むかを計測し、アプリの /report のページで見られるようにする。
+牌譜の読み込みと集計はローカルで行い、アプリには集計した数字（`src/data/report.json`）だけを入れる。
 
 ## 計測すること
 
@@ -36,7 +36,7 @@
 
 ### 2. 集計の確認
 
-結果を信じてよいかを確かめるため、レポートに次の数を出す。
+結果を信じてよいかを確かめるため、計測を実行したときにターミナルに次の数を出す（レポートのページには載せない）。
 
 - 対象の場面で、牌譜でリーチ者が他家からロンした牌のうち、こちらの判定が「当たり」でなかった数（0になるはず）。
   待ちの計算とフリテン判定を、実際のロンで照合する。
@@ -44,15 +44,15 @@
 - 待ちが計算できなかった（聴牌していない）リーチの数（0になるはず）。
 - 読み込めずに飛ばした牌譜の数。
 
-## レポート（HTML）
+## レポート（/report）
 
-1つのHTMLファイルに出力する。牌はアプリと同じ画像（`public/images/{種類}/{色}/{番号}.png`）を
-埋め込んで表示するので、ファイル単体でブラウザで開ける。画像フォルダの種類は 1: 索子、2: 萬子、3: 筒子。
-字牌は画像がないので、文字（東南西北白發中）を牌の形に描く。
+アプリの2つ目のページ（`report/index.html` → `src/report.ts` → `src/ReportPage.vue`）として作る。
+Viteの複数ページのビルドで `docs/report/index.html` に出力されるので、公開URLは `/vue-anpai/report/` になる。
+ルーターは使わない（GitHub Pagesで /report を直接開いても404にならない）。トップ画面からのリンクは置かない。
 
-1. **概要**: 使った牌譜（年・半荘数・局数）、対象の場面の数、リーチの数、計測の定義。
-2. **色ごとの振込率**: 行ごとの母数・振り込み・振込率の表と、振込率の横棒グラフ。
-3. **集計の確認**: 上の「集計の確認」の数。
+1. **概要**: 使った牌譜（ファイル名・半荘数・局数）、リーチの数、対象の場面の数、振込率の定義。
+2. **色ごとの振込率**: 行ごとの母数・振り込み・振込率の表と、振込率の横棒（スマホでは横棒を出さない）。
+   行の色の見本に、アプリの牌画像（5萬）をその色で出す。字牌の行は画像がないので「東」を文字で出す。
 
 ## データ
 
@@ -61,7 +61,7 @@ Hugging Face の [nikketryhard/tenhou-houou-mjai](https://huggingface.co/dataset
 
 - tarの中身は、半荘ごとの `{牌譜ID}.mjai.json.zst`（mjai形式のイベントを1行1つ並べたJSONをzstdで圧縮したもの）。
 - リポジトリの外（`~/mahjong-data/`）に置く。
-- 牌譜の利用は天鳳の規約に従い、ローカルでの集計だけに使う。
+- 牌譜の利用は天鳳の規約に従う。牌譜そのものはリポジトリにもアプリにも入れず、集計した数字だけを入れる。
 
 ```sh
 huggingface-cli download nikketryhard/tenhou-houou-mjai tenhou-houou-2025.tar \
@@ -78,11 +78,18 @@ npm run analyze -- ~/mahjong-data/tenhou-houou-2025.tar --limit 5000
 npm run analyze -- ~/mahjong-data/tenhou-houou-2025.tar
 ```
 
-レポートは `analysis/out/report.html` に出力する（`--out` で変更できる）。`analysis/out/` はgitに含めない。
+集計結果は `src/data/report.json` に書き出す（`--out` で変更できる）。このJSONはコミットする。
+
+```sh
+# 手元で見る（http://localhost:5173/vue-anpai/report/）
+npm run dev
+# 公開用にビルドする（docs/ に出力。main に push すると GitHub Pages に反映される）
+npm run build
+```
 
 ## 構成
 
-`vue-project/analysis/` に置く。アプリの `src/` とは分け、ビルドには含めない。
+計測は `vue-project/analysis/` に置く。アプリの `src/` とは分け、ビルドには含めない。
 TypeScriptを `vite-node`（vitestに含まれている）で実行し、新しいパッケージは追加しない。
 tarは自前で読み、zstdの解凍はNode標準の `zlib.zstdDecompressSync` を使う。
 
@@ -93,10 +100,20 @@ tarは自前で読み、zstdの解凍はNode標準の `zlib.zstdDecompressSync` 
 | `tar.ts` | tarファイルを先頭から読み、牌譜IDと解凍したmjaiのテキストを1半荘ずつ返す |
 | `replay.ts` | 1半荘のイベントを再生し、手牌・捨て牌・リーチ・フリテンを追って、対象の場面を1つずつ返す |
 | `tally.ts` | 場面ごとに牌に色を付けて、行ごとの母数と振り込みを数える |
-| `report.ts` | 集計結果からHTMLを作る |
-| `main.ts` | 引数（tarのパス・`--limit`・`--out`）を読み、上をつないでレポートを書き出す |
+| `main.ts` | 引数（tarのパス・`--limit`・`--out`）を読み、上をつないで `src/data/report.json` を書き出す |
 
-`package.json` に `"analyze": "vite-node analysis/main.ts"` を追加する。
+`package.json` に `"analyze": "vite-node analysis/main.ts --"` を追加する（vite-node は `--` の後ろの引数をスクリプトに渡す）。
+Node は v23.9 以上が必要（`zlib.zstdDecompressSync` を使う）。
+
+レポートのページは次のファイルで作る。
+
+| ファイル | 役割 |
+|---|---|
+| `report/index.html` | 2つ目のページのHTML（`vite.config.ts` の `build.rollupOptions.input` に追加） |
+| `src/report.ts` | ページの入口 |
+| `src/ReportPage.vue` | 概要と色ごとの振込率の表 |
+| `src/helpers/report.ts` | 集計結果の型、振込率の表示、横棒の長さ、行と牌画像の色の対応 |
+| `src/data/report.json` | 計測スクリプトが書き出す集計結果 |
 
 ## テスト
 
@@ -107,7 +124,7 @@ vitestで次をテストする（`npx vitest run`）。
 - `replay.ts`: 手で書いた短いmjaiの局で、対象の場面の取り出し、2人目のリーチ後に数えないこと、
   鳴かれた牌が捨て牌に入ること、リーチ後の見逃しでフリテンになること。
 - `tally.ts`: 色の付け方、当たりの判定、行ごとの数え方、ロンとの照合。
-- `report.ts`: 小さな集計結果からHTMLが作れること（色ごとの振込率の表が含まれ、シミュレーター通りの振込率と実例は載せないこと）。
+- `src/helpers/report.ts`: 振込率の表示（母数0は「-」）、横棒の長さ（NaNにならないこと）、行と牌画像の色の対応。
 
 ## 割り切り
 
