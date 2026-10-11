@@ -8,7 +8,8 @@
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --noEmit",
-    "test": "vitest"
+    "test": "vitest",
+    "analyze": "vite-node analysis/main.ts --"
   },
   "dependencies": {
     "bootstrap": "^5.2.3",
