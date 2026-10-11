@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { rate_text, bar_widths, COLOR_OF_ROW } from './report'
+import { rate_text, bar_widths, rate_text_of_status, COLOR_OF_ROW } from './report'
 
 describe('rate_text', () => {
   it('振込率を小数1桁の%で出し、母数が0なら「-」', () => {
@@ -28,5 +28,25 @@ describe('COLOR_OF_ROW', () => {
     expect(COLOR_OF_ROW).toEqual({
       現物: '#4cd964', 濃い青: '#007aff', 薄い青: '#c7e2ff', 薄い赤: '#ffd2ce', 濃い赤: '#ff3b30', 無地: '#dddddd', 字牌: null,
     })
+  })
+})
+
+describe('rate_text_of_status', () => {
+  const rows = [
+    { row: '濃い青', n: 2194842, hits: 39385 },
+    { row: '薄い青', n: 11735518, hits: 498999 },
+    { row: '薄い赤', n: 64309733, hits: 5868024 },
+    { row: '濃い赤', n: 20269057, hits: 2720439 },
+  ]
+
+  it('理由の色（safe・likely_safe・caution・danger）に対応する行の振込率を出す', () => {
+    expect(rate_text_of_status(rows, 'safe')).toBe('1.8%')
+    expect(rate_text_of_status(rows, 'likely_safe')).toBe('4.3%')
+    expect(rate_text_of_status(rows, 'caution')).toBe('9.1%')
+    expect(rate_text_of_status(rows, 'danger')).toBe('13.4%')
+  })
+
+  it('集計結果にその行がなければ「-」', () => {
+    expect(rate_text_of_status([], 'safe')).toBe('-')
   })
 })

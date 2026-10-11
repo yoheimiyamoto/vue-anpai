@@ -54,6 +54,9 @@ Viteの複数ページのビルドで `docs/report/index.html` に出力され�
 2. **色ごとの振込率**: 行ごとの母数・振り込み・振込率の表と、振込率の横棒（スマホでは横棒を出さない）。
    行の色の見本に、アプリの牌と同じ色の四角を出す。字牌はアプリでも色が付かないので四角を出さない。
 
+トップ画面の理由（`src/components/Reasons.vue`）の末尾にも、その理由の色の振込率を「（振込率4.3%）」の形で出す。
+数字は同じ `src/data/report.json` を使う（理由の色 safe・likely_safe・caution・danger を、濃い青・薄い青・薄い赤・濃い赤の行に対応させる）。
+
 ## データ
 
 Hugging Face の [nikketryhard/tenhou-houou-mjai](https://huggingface.co/datasets/nikketryhard/tenhou-houou-mjai) にある、
@@ -124,7 +127,7 @@ vitestで次をテストする（`npx vitest run`）。
 - `replay.ts`: 手で書いた短いmjaiの局で、対象の場面の取り出し、2人目のリーチ後に数えないこと、
   鳴かれた牌が捨て牌に入ること、リーチ後の見逃しでフリテンになること。
 - `tally.ts`: 色の付け方、当たりの判定、行ごとの数え方、ロンとの照合。
-- `src/helpers/report.ts`: 振込率の表示（母数0は「-」）、横棒の長さ（NaNにならないこと）、行と色の対応。
+- `src/helpers/report.ts`: 振込率の表示（母数0は「-」）、横棒の長さ（NaNにならないこと）、行と色の対応、理由の色ごとの振込率。
 
 ## 割り切り
 

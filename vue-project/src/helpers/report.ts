@@ -37,3 +37,17 @@ export function bar_widths(rows: RowStat[]): string[] {
   const max = Math.max(...rates)
   return rates.map(rate => `${(max ? rate / max * 100 : 0).toFixed(1)}%`)
 }
+
+// 理由の色（Reasons.vue の status）と、集計結果の行の対応
+const ROW_OF_STATUS: { [status: string]: string } = {
+  safe: '濃い青',
+  likely_safe: '薄い青',
+  caution: '薄い赤',
+  danger: '濃い赤',
+}
+
+// 理由の色の振込率（集計結果にその行がなければ「-」）
+export function rate_text_of_status(rows: RowStat[], status: string): string {
+  const stat = rows.find(s => s.row == ROW_OF_STATUS[status])
+  return stat ? rate_text(stat.hits, stat.n) : '-'
+}

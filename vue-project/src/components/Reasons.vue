@@ -1,5 +1,10 @@
 <script lang="ts">
 import {get_reasons} from '../helpers/reasons'
+import {rate_text_of_status, type ReportData} from '../helpers/report'
+import report_json from '../data/report.json'
+
+// 天鳳鳳凰卓の牌譜で計測した色ごとの振込率（/report と同じ数字）
+const report = report_json as ReportData
 
 // tile_type（画像フォルダ images/{tile_type}）ごとの牌の種類
 const suit_names: { [tile_type: number]: string } = {
@@ -29,6 +34,13 @@ export default {
           reasons: get_reasons(this.selected_numbers[tile_type]),
         }))
     }
+  },
+
+  methods: {
+    // 理由の色の振込率（例: 4.3%）
+    rate(status: string): string {
+      return rate_text_of_status(report.rows, status)
+    }
   }
 }
 </script>
@@ -41,7 +53,7 @@ export default {
       <ul>
         <li v-for="reason in suit.reasons" :key="reason.title">
           <span class="numbers" :class="reason.status">{{ reason.numbers.join('・') }}</span>
-          <span class="fw-bold">{{ reason.title }}</span>
+          <span class="fw-bold">{{ reason.title }}</span>（振込率{{ rate(reason.status) }}）
         </li>
       </ul>
     </section>
