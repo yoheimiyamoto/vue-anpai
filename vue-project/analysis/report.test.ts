@@ -43,6 +43,12 @@ describe('render_report', () => {
     expect(html).toContain('class="tile honor default riichi"')
   })
 
+  it('見逃しの数に、場面全体に占める割合と理由を添える', () => {
+    const html = render_report({ ...make_data(), scenes: 1000, missed_rons: 2 }, '')
+    expect(html).toContain('場面全体の0.200%')
+    expect(html).toContain('オーラスの着順のための見逃しや切断')
+  })
+
   it('母数が0の行は当たり率を「-」にし、NaNを出さない', () => {
     const html = render_report(make_data(), '')
     expect(html).not.toContain('NaN')

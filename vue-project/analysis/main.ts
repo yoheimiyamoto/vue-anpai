@@ -40,6 +40,9 @@ for (const log of read_game_logs(path)) {
     break
   }
   try {
+    if (log.error) {
+      throw new Error(`解凍できません: ${log.error}`)
+    }
     const events = log.text.trim().split('\n').map(line => JSON.parse(line))
     const result = replay_game(log.id, events)
     // 半荘の最後まで再生できたものだけ数える

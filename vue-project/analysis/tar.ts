@@ -3,8 +3,9 @@ import { zstdDecompressSync } from 'node:zlib'
 
 // tarの中の1半荘分の牌譜
 export type GameLog = {
-  id: string    // 天鳳の牌譜ID（ファイル名から .mjai.json.zst を除いたもの）
-  text: string  // mjaiのイベントを1行1つ並べたJSON
+  id: string      // 天鳳の牌譜ID（ファイル名から .mjai.json.zst を除いたもの）
+  text: string    // mjaiのイベントを1行1つ並べたJSON
+  error?: string  // 解凍できなかったときの理由（text は空）
 }
 
 const BLOCK = 512
@@ -53,7 +54,15 @@ export function* read_game_logs(path: string): Generator<GameLog> {
 
       if ((type == '0' || type == '\0') && file_path.endsWith('.mjai.json.zst')) {
         const id = file_path.split('/').pop()!.replace(/\.mjai\.json\.zst$/, '')
-        yield { id, text: zstdDecompressSync(body).toString('utf8') }
+        // 壊れたファイルがあっても止めずに、読めなかったことを呼び出し側に伝えて次へ進む
+        let text = ''
+        try {
+          text = zstdDecompressSync(body).toString('utf8')
+        } catch (e) {
+          yield { id, text, error: (e as Error).message }
+          continue
+        }
+        yield { id, text }
       }
     }
   } finally {

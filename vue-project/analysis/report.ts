@@ -108,7 +108,8 @@ ${rows}
 function checks_html(data: ReportData): string {
   const items: [string, number, string][] = [
     ['牌譜でリーチ者がロンしたのに、判定が「当たり」でなかった打牌', data.ron_mismatches, '0になるはず'],
-    ['判定は「当たり」なのに、牌譜ではロンされなかった打牌（見逃し）', data.missed_rons, 'ほぼ0のはず'],
+    ['判定は「当たり」なのに、牌譜ではロンされなかった打牌（見逃し）', data.missed_rons,
+      `場面全体の${data.scenes ? (data.missed_rons / data.scenes * 100).toFixed(3) : 0}%。オーラスの着順のための見逃しや切断などで起きる`],
     ['待ちが計算できなかったリーチ', data.riichis_without_waits, '0になるはず'],
     ['読めずに飛ばした半荘', data.skipped_games, ''],
   ]

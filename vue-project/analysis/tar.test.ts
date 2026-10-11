@@ -61,6 +61,17 @@ describe('read_game_logs', () => {
     expect([...read_game_logs(path)].map(log => log.id)).toEqual(['2025010100gm-00a9-0000-cccccccc'])
   })
 
+  it('解凍できないファイルは error を付けて返し、続きを読む', () => {
+    const path = write_tar(make_tar([
+      { name: 'a/2025010100gm-00a9-0000-aaaaaaaa.mjai.json.zst', body: Buffer.from('not zstd') },
+      { name: 'a/2025010100gm-00a9-0000-bbbbbbbb.mjai.json.zst', body: compressed('{"type":"end_game"}\n') },
+    ]))
+    const logs = [...read_game_logs(path)]
+    expect(logs[0].id).toBe('2025010100gm-00a9-0000-aaaaaaaa')
+    expect(logs[0].error).toBeTruthy()
+    expect(logs[1]).toEqual({ id: '2025010100gm-00a9-0000-bbbbbbbb', text: '{"type":"end_game"}\n' })
+  })
+
   it('途中で切れたtarは、読めたところまで返す', () => {
     const tar = make_tar([
       { name: 'a/2025010100gm-00a9-0000-aaaaaaaa.mjai.json.zst', body: compressed('{"type":"start_game"}\n') },
